@@ -2,7 +2,7 @@
   "loginPage": {
     "title": "塔拉瓦管理員",
     "fromPalisadoes": "柵欄 基金会志愿者的开源应用程序",
-    "talawa_portal": "塔拉瓦門戶",
+    "talawa_portal": "塔拉瓦管理門戶",
     "login": "登錄",
     "register": "登記",
     "firstName": "名",
@@ -10,6 +10,7 @@
     "email": "電子郵件",
     "password": "密碼",
     "atleast_8_char_long": "至少 8 個字符長",
+    "Password_and_Confirm_password_mismatches.": "密碼和確認密碼不匹配。",
     "confirmPassword": "確認密碼",
     "forgotPassword": "忘記密碼 ？",
     "enterEmail": "输入电子邮件",
@@ -17,7 +18,7 @@
     "doNotOwnAnAccount": "沒有帳戶嗎？"
   },
   "listNavbar": {
-    "talawa_portal": "塔拉瓦門戶",
+    "talawa_portal": "塔拉瓦管理門戶",
     "roles": "角色",
     "requests": "要求",
     "logout": "登出"
@@ -71,7 +72,7 @@
     "enterName": "输入名字"
   },
   "adminNavbar": {
-    "talawa_portal": "塔拉瓦門戶",
+    "talawa_portal": "塔拉瓦管理門戶",
     "Dashboard": "儀表板",
     "People": "人們",
     "Events": "事件",
@@ -182,7 +183,8 @@
     "isPublic": "是公開的",
     "isRegistrable": "可註冊",
     "close": "關",
-    "updatePost": "更新帖子"
+    "updatePost": "更新帖子",
+    "eventDetails": "活動詳情"
   },
   "orgPost": {
     "title": "塔拉瓦郵報",
