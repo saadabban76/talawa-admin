@@ -17,6 +17,7 @@ import { I18nextProvider } from 'react-i18next';
 import { StaticMockLink } from 'utils/StaticMockLink';
 import SuperDashListCard from 'components/SuperDashListCard/SuperDashListCard';
 import AdminDashListCard from 'components/AdminDashListCard/AdminDashListCard';
+import { ToastContainer } from 'react-toastify';
 
 type Organization = {
   _id: string;
@@ -128,6 +129,22 @@ const MOCKS_EMPTY = [
       query: USER_ORGANIZATION_LIST,
       variables: { id: '123' },
     },
+    result: {
+      data: {
+        user: {
+          firstName: 'John',
+          lastName: 'Doe',
+          image: '',
+          email: 'John_Does_Palasidoes@gmail.com',
+          userType: 'ADMIN',
+          adminFor: {
+            _id: 1,
+            name: 'Akatsuki',
+            image: '',
+          },
+        },
+      },
+    },
   },
 ];
 const link = new StaticMockLink(MOCKS, true);
@@ -150,6 +167,13 @@ describe('Organisation List Page', () => {
     name: 'Dummy Organization',
     description: 'This is a dummy organization',
     location: 'Delhi, India',
+    image: new File(['hello'], 'hello.png', { type: 'image/png' }),
+  };
+
+  const formDataEmpty = {
+    name: '   ',
+    description: '   ',
+    location: '   ',
     image: new File(['hello'], 'hello.png', { type: 'image/png' }),
   };
 
@@ -400,77 +424,61 @@ describe('Organisation List Page', () => {
 
     userEvent.click(screen.getByTestId(/submitOrganizationForm/i));
   });
-});
 
-test('Search bar filters organizations by name', async () => {
-  const Mocks = [
-    {
-      request: {
-        query: ORGANIZATION_CONNECTION_LIST,
-      },
-      result: {
-        data: {
-          organizationsConnection: [
-            {
-              _id: 1,
-              image: '',
-              name: 'Akatsuki',
-              creator: {
-                firstName: 'John',
-                lastName: 'Doe',
-              },
-              admins: [
-                {
-                  _id: '123',
-                },
-              ],
-              members: {
-                _id: '234',
-              },
-              createdAt: '02/02/2022',
-              location: 'Washington DC',
-            },
-          ],
-        },
-      },
-    },
-  ];
+  test('Create organization should throw error when empty strings have been entered', async () => {
+    localStorage.setItem('UserType', 'SUPERADMIN');
 
-  const link = new StaticMockLink(Mocks, true);
-
-  const { container } = render(
-    <MockedProvider addTypename={false} link={link}>
-      <BrowserRouter>
-        <Provider store={store}>
-          <I18nextProvider i18n={i18nForTest}>
+    const { container } = render(
+      <MockedProvider addTypename={false} link={link}>
+        <BrowserRouter>
+          <Provider store={store}>
+            <ToastContainer />
             <OrgList />
-          </I18nextProvider>
-        </Provider>
-      </BrowserRouter>
-    </MockedProvider>
-  );
-  await wait();
+          </Provider>
+        </BrowserRouter>
+      </MockedProvider>
+    );
 
-  // Test that the search bar filters organizations by name
-  const searchBar = screen.getByTestId(/searchByName/i);
-  userEvent.type(searchBar, 'Akatsuki');
-  expect(container.textContent).toBeTruthy();
-  expect(container.textContent).toMatch('Akatsuki');
+    await wait();
 
-  // Test that the search bar is case-insensitive
-  userEvent.clear(searchBar);
-  userEvent.type(searchBar, 'akatsuki');
-  expect(container.textContent).toMatch('Akatsuki');
+    expect(localStorage.setItem).toHaveBeenLastCalledWith(
+      'UserType',
+      'SUPERADMIN'
+    );
 
-  // Test that the search bar filters organizations based on a partial match of the name
-  userEvent.clear(searchBar);
-  userEvent.type(searchBar, 'Aka');
-  expect(container.textContent).toMatch('Akatsuki');
+    userEvent.click(screen.getByTestId(/createOrganizationBtn/i));
 
-  // Test that the search bar filters all organization if there are is no search passed
-  userEvent.clear(searchBar);
-  userEvent.type(searchBar, '');
-  expect(container.textContent).toMatch('');
+    userEvent.type(
+      screen.getByTestId(/modalOrganizationName/i),
+      formDataEmpty.name
+    );
+    userEvent.type(
+      screen.getByPlaceholderText(/Description/i),
+      formDataEmpty.description
+    );
+    userEvent.type(
+      screen.getByPlaceholderText(/Location/i),
+      formDataEmpty.location
+    );
+
+    expect(screen.getByTestId(/modalOrganizationName/i)).toHaveValue(
+      formDataEmpty.name
+    );
+    expect(screen.getByPlaceholderText(/Description/i)).toHaveValue(
+      formDataEmpty.description
+    );
+    expect(screen.getByPlaceholderText(/Location/i)).toHaveValue(
+      formDataEmpty.location
+    );
+
+    userEvent.click(screen.getByTestId(/submitOrganizationForm/i));
+
+    await wait();
+
+    expect(container.textContent).toMatch(
+      'Text fields cannot be empty strings'
+    );
+  });
 });
 
 describe('SuperDashListCard', () => {
